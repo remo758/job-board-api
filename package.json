@@ -1,0 +1,27 @@
+{
+  "name": "job-board",
+  "version": "1.0.0",
+  "description": "ZtM-Job-Board",
+  "main": "server.js",
+  "scripts": {
+    "precommit": "pretty-quick --staged",
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-prettier": "^2.6.0",
+    "husky": "^0.14.3",
+    "lint-staged": "^7.0.5",
+    "nodemon": "^1.17.4",
+    "prettier": "^1.12.1",
+    "pretty-quick": "^1.4.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3"
+  }
+}
