@@ -1,9 +1,27 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt-nodejs");
 
-// @route   GET api/users/test
-// @desc    Tests users route
+// Load User
+const User = require("../../models/User");
+
+// @route   POST api/users/register
+// @desc    Register user
 // @access  Public
-router.get("/test", (req, res) => res.send("Test"));
+router.post("/register", (req, res) => {
+  const { name, email, password } = req.body;
+  User.findOne({ email }).then(user => {
+    user
+      ? res.status(400).json("Email already exists")
+      : new User({
+          name,
+          email,
+          password: bcrypt.hashSync(password)
+        })
+          .save()
+          .then(user => res.json(user))
+          .catch(err => console.log(err));
+  });
+});
 
 module.exports = router;
