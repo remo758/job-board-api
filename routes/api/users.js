@@ -8,7 +8,7 @@ const { APP_SECRET } = require("../../config/keys");
 const User = require("../../models/User");
 
 // @route   POST api/users/register
-// @desc    Register user
+// @desc    Register user / Returning JWT Token
 // @access  Public
 router.post("/register", (req, res) => {
   const { name, email, password } = req.body;
@@ -22,7 +22,7 @@ router.post("/register", (req, res) => {
         })
           .save()
           .then(user => {
-            // Token
+            // JWT Token
             const token = jwt.sign({ userId: user.id }, APP_SECRET);
             res.json({
               token: "Bearer " + token,
@@ -47,7 +47,7 @@ router.post("/login", (req, res) => {
     const valid = bcrypt.compareSync(password, user.password);
     !valid && res.status(400).json("Invalid password");
 
-    // Token
+    // JWT Token
     const token = jwt.sign({ userId: user.id }, APP_SECRET);
     res.json({
       token: "Bearer " + token,
