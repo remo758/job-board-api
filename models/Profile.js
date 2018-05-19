@@ -1,11 +1,20 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// Profile SChema
+// Profile Schema
 const profileSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
     ref: "users"
+  },
+  username: {
+    type: String,
+    required: true,
+    max: 40
+  },
+  jobTitle: {
+    type: String,
+    required: true
   },
   img: {
     type: String,
