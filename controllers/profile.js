@@ -1,3 +1,4 @@
+// get current profile
 const getProfile = (Profile, jwt, APP_SECRET, getUserId) => (req, res) => {
   const userId = getUserId(req, res, jwt, APP_SECRET);
   Profile.findOne({ user: userId })
@@ -9,6 +10,7 @@ const getProfile = (Profile, jwt, APP_SECRET, getUserId) => (req, res) => {
     .catch(err => res.status(404).json(err));
 };
 
+// add and update profile
 const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
   req,
   res
@@ -31,12 +33,11 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
     username: Joi.string()
       .alphanum()
       .min(3)
-      .max(40)
+      .max(60)
       .required(),
     jobTitle: Joi.string()
-      .alphanum()
       .min(3)
-      .max(30)
+      .max(60)
       .required(),
     img: Joi.string()
       .uri()
@@ -45,17 +46,14 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
     linkedin: Joi.string().uri(),
     github: Joi.string().uri(),
     city: Joi.string()
-      .alphanum()
       .min(3)
-      .max(40),
+      .max(60),
     state: Joi.string()
-      .alphanum()
       .min(3)
-      .max(40),
+      .max(60),
     country: Joi.string()
-      .alphanum()
       .min(3)
-      .max(40)
+      .max(60)
   });
 
   Joi.validate(
@@ -113,9 +111,10 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
         })
         .catch(err => res.status(400).json(err));
     })
-    .catch(err => res.status(400).json(err));
+    .catch(err => res.status(400).json(err.details[0].message));
 };
 
+// get profile - params
 const profile = Profile => (req, res) => {
   const { username } = req.params;
   Profile.findOne({ username })
@@ -127,6 +126,7 @@ const profile = Profile => (req, res) => {
     .catch(err => res.status(404).json(err));
 };
 
+// get all profiles
 const profiles = Profile => (req, res) => {
   Profile.find()
     .populate("user", "name")

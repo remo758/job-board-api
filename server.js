@@ -5,9 +5,11 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
+const cors = require("cors");
 const getUserId = require("./controllers/auth");
 const signup = require("./controllers/signup");
 const login = require("./controllers/login");
+const { postProject, updateProject } = require("./controllers/project");
 const {
   getProfile,
   postProfile,
@@ -18,8 +20,11 @@ const {
 // Load Models
 const User = require("./models/User");
 const Profile = require("./models/Profile");
+const Project = require("./models/Project");
 
 const app = express();
+
+app.use(cors());
 
 // Body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -39,6 +44,12 @@ app.get("/profile", getProfile(Profile, jwt, APP_SECRET, getUserId));
 app.post("/profile", postProfile(Profile, jwt, APP_SECRET, getUserId, Joi));
 app.get("/user/:username", profile(Profile));
 app.get("/profile/all", profiles(Profile));
+
+app.post("/project", postProject(Project, jwt, APP_SECRET, getUserId, Joi));
+app.post(
+  "/project/:id",
+  updateProject(Project, jwt, APP_SECRET, getUserId, Joi)
+);
 
 const port = process.env.PORT;
 app.listen(port, () => {

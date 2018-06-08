@@ -10,7 +10,7 @@ const profileSchema = new Schema({
   username: {
     type: String,
     required: true,
-    max: 40
+    max: 60
   },
   jobTitle: {
     type: String,

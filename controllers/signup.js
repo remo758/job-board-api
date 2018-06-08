@@ -4,9 +4,8 @@ const signup = (User, bcrypt, jwt, APP_SECRET, Joi) => (req, res) => {
   // validation
   const schema = Joi.object().keys({
     name: Joi.string()
-      .alphanum()
       .min(3)
-      .max(30)
+      .max(60)
       .required(),
     email: Joi.string()
       .email()
@@ -40,7 +39,7 @@ const signup = (User, bcrypt, jwt, APP_SECRET, Joi) => (req, res) => {
         })
         .catch(err => res.status(400).json(err));
     })
-    .catch(err => res.status(400).json(err));
+    .catch(err => res.status(400).json(err.details[0].message));
 };
 
 module.exports = signup;

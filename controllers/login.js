@@ -31,7 +31,7 @@ const login = (User, bcrypt, jwt, APP_SECRET, Joi) => (req, res) => {
         })
         .catch(err => res.status(400).json(err));
     })
-    .catch(err => res.status(400).json(err));
+    .catch(err => res.status(400).json(err.details[0].message));
 };
 
 module.exports = login;
