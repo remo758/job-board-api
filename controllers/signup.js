@@ -1,12 +1,8 @@
 const signup = (User, bcrypt, jwt, APP_SECRET, Joi) => (req, res) => {
-  const { name, email, password } = req.body;
+  const { email, password } = req.body;
 
   // validation
   const schema = Joi.object().keys({
-    name: Joi.string()
-      .min(3)
-      .max(60)
-      .required(),
     email: Joi.string()
       .email()
       .required(),
@@ -15,14 +11,13 @@ const signup = (User, bcrypt, jwt, APP_SECRET, Joi) => (req, res) => {
       .required()
   });
 
-  Joi.validate({ name, email, password }, schema)
+  Joi.validate({ email, password }, schema)
     .then(() => {
       User.findOne({ email })
         .then(user => {
           user
             ? res.status(400).json("Email already exists")
             : new User({
-                name,
                 email,
                 password: bcrypt.hashSync(password)
               })
@@ -31,7 +26,7 @@ const signup = (User, bcrypt, jwt, APP_SECRET, Joi) => (req, res) => {
                   // JWT Token
                   const token = jwt.sign({ userId: user.id }, APP_SECRET);
                   res.json({
-                    token: token,
+                    token,
                     user
                   });
                 })

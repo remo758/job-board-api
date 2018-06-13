@@ -9,7 +9,12 @@ const cors = require("cors");
 const getUserId = require("./controllers/auth");
 const signup = require("./controllers/signup");
 const login = require("./controllers/login");
-const { postProject, updateProject } = require("./controllers/project");
+const {
+  postProject,
+  removeProject,
+  projects,
+  getProjects
+} = require("./controllers/project");
 const {
   getProfile,
   postProfile,
@@ -39,17 +44,18 @@ mongoose
 
 const APP_SECRET = process.env.APP_SECRET;
 app.post("/signup", signup(User, bcrypt, jwt, APP_SECRET, Joi));
+
 app.post("/login", login(User, bcrypt, jwt, APP_SECRET, Joi));
+
 app.get("/profile", getProfile(Profile, jwt, APP_SECRET, getUserId));
 app.post("/profile", postProfile(Profile, jwt, APP_SECRET, getUserId, Joi));
-app.get("/user/:username", profile(Profile));
+app.get("/users/:userId", profile(Profile));
 app.get("/profile/all", profiles(Profile));
 
 app.post("/project", postProject(Project, jwt, APP_SECRET, getUserId, Joi));
-app.post(
-  "/project/:id",
-  updateProject(Project, jwt, APP_SECRET, getUserId, Joi)
-);
+app.get("/projects", getProjects(Project, jwt, APP_SECRET, getUserId));
+app.get("/projects/all/:userId", projects(Project));
+app.delete("/project/:id", removeProject(Project, jwt, APP_SECRET, getUserId));
 
 const port = process.env.PORT;
 app.listen(port, () => {

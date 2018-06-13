@@ -23,7 +23,7 @@ const postProject = (Project, jwt, APP_SECRET, getUserId, Joi) => (
   Joi.validate({ title, img, url }, schema)
     .then(() => {
       const projectFields = { user: userId, title, img, url };
-      // create profile
+      // create project
       new Project(projectFields)
         .save()
         .then(project => res.json(project))
@@ -32,24 +32,43 @@ const postProject = (Project, jwt, APP_SECRET, getUserId, Joi) => (
     .catch(err => res.status(400).json(err.details[0].message));
 };
 
-// update project
-const updateProject = (Project, jwt, APP_SECRET, getUserId, Joi) => (
-  req,
-  res
-) => {
+// remove project
+const removeProject = (Project, jwt, APP_SECRET, getUserId) => (req, res) => {
   const userId = getUserId(req, res, jwt, APP_SECRET);
   const { id } = req.params;
-  const { title, img, url } = req.body;
-  const projectFields = { user: userId, title, img, url };
-  Project.findOne({ _id: id }).then(project => {
-    !project && res.status(400).json("No Project");
-    Project.findOneAndUpdate(
-      { _id: id },
-      { $set: projectFields },
-      { new: true }
-    )
-      .then(project => res.json(project))
-      .catch(err => res.status(400).json(err));
-  });
+  Project.find({ user: userId })
+    .then(projects => {
+      !projects[0]
+        ? res.status(404).json("There are no projects for this user")
+        : Project.findOneAndRemove({ _id: id })
+            .then(() => res.json("done"))
+            .catch(err => res.status(400).json(err));
+    })
+    .catch(err => res.status(400).json(err));
 };
-module.exports = { postProject, updateProject };
+
+// get all projects for user params
+const projects = Project => (req, res) => {
+  const { userId } = req.params;
+  Project.find({ user: userId })
+    .then(projects => {
+      !projects[0] &&
+        res.status(404).json("There are no projects for this user");
+      res.json(projects);
+    })
+    .catch(err => res.status(404).json(err));
+};
+
+// get all projects for current user
+const getProjects = (Project, jwt, APP_SECRET, getUserId) => (req, res) => {
+  const userId = getUserId(req, res, jwt, APP_SECRET);
+  Project.find({ user: userId })
+    .then(project => {
+      !project[0] &&
+        res.status(404).json("There are no projects for this user");
+      res.json(project);
+    })
+    .catch(err => res.status(404).json(err));
+};
+
+module.exports = { postProject, removeProject, projects, getProjects };

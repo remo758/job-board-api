@@ -25,7 +25,7 @@ const login = (User, bcrypt, jwt, APP_SECRET, Joi) => (req, res) => {
           // jwt token
           const token = jwt.sign({ userId: user.id }, APP_SECRET);
           res.json({
-            token: token,
+            token,
             user
           });
         })

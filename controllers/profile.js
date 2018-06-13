@@ -2,7 +2,6 @@
 const getProfile = (Profile, jwt, APP_SECRET, getUserId) => (req, res) => {
   const userId = getUserId(req, res, jwt, APP_SECRET);
   Profile.findOne({ user: userId })
-    .populate("user", "name")
     .then(profile => {
       !profile && res.status(404).json("There is no profile for this user");
       res.json(profile);
@@ -17,7 +16,8 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
 ) => {
   const userId = getUserId(req, res, jwt, APP_SECRET);
   const {
-    username,
+    firstName,
+    lastName,
     jobTitle,
     img,
     website,
@@ -30,8 +30,11 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
 
   // validation
   const schema = Joi.object().keys({
-    username: Joi.string()
-      .alphanum()
+    firstName: Joi.string()
+      .min(3)
+      .max(60)
+      .required(),
+    lastName: Joi.string()
       .min(3)
       .max(60)
       .required(),
@@ -58,7 +61,8 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
 
   Joi.validate(
     {
-      username,
+      firstName,
+      lastName,
       jobTitle,
       img,
       website,
@@ -73,7 +77,8 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
     .then(() => {
       const profileFields = {};
       profileFields.user = userId;
-      username && (profileFields.username = username);
+      firstName && (profileFields.firstName = firstName);
+      lastName && (profileFields.lastName = lastName);
       jobTitle && (profileFields.jobTitle = jobTitle);
       img && (profileFields.img = img);
       profileFields.links = {};
@@ -97,16 +102,9 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
                 .then(profile => res.json(profile))
                 .catch(err => res.status(400).json(err))
             : // Create
-              // Check if username exists
-              Profile.findOne({ username })
-                .then(profile => {
-                  profile && res.status(400).json("username already exists");
-                  // Save Profile
-                  new Profile(profileFields)
-                    .save()
-                    .then(profile => res.json(profile))
-                    .catch(err => res.status(400).json(err));
-                })
+              new Profile(profileFields)
+                .save()
+                .then(profile => res.json(profile))
                 .catch(err => res.status(400).json(err));
         })
         .catch(err => res.status(400).json(err));
@@ -116,9 +114,8 @@ const postProfile = (Profile, jwt, APP_SECRET, getUserId, Joi) => (
 
 // get profile - params
 const profile = Profile => (req, res) => {
-  const { username } = req.params;
-  Profile.findOne({ username })
-    .populate("user", "name")
+  const { userId } = req.params;
+  Profile.findOne({ user: userId })
     .then(profile => {
       !profile && res.status(404).json("There is no profile for this user");
       res.json(profile);
@@ -129,7 +126,6 @@ const profile = Profile => (req, res) => {
 // get all profiles
 const profiles = Profile => (req, res) => {
   Profile.find()
-    .populate("user", "name")
     .then(profiles => {
       !profiles && res.status(404).json("There are no profiles");
       res.json(profiles);

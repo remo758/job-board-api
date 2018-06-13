@@ -7,10 +7,13 @@ const profileSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "users"
   },
-  username: {
+  firstName: {
     type: String,
-    required: true,
-    max: 60
+    required: true
+  },
+  lastName: {
+    type: String,
+    required: true
   },
   jobTitle: {
     type: String,
